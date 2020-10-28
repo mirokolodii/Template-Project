@@ -1,4 +1,4 @@
-package com.example.templateproject
+package com.unagit.templateproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

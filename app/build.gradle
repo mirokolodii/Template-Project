@@ -8,7 +8,7 @@ android {
     compileSdkVersion VersionsSdk.compileSdk
 
     defaultConfig {
-        applicationId "com.example.templateproject"
+        applicationId "com.unagit.templateproject"
         minSdkVersion VersionsSdk.minSdk
         targetSdkVersion VersionsSdk.targetSdk
         versionCode 1
@@ -21,6 +21,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-dev"
         }
     }
     compileOptions {
@@ -37,7 +41,7 @@ dependencies {
     implementation DependenciesJetpack.androidxAppcompatLib
     implementation DependenciesJetpack.androidxMaterialLib
     implementation DependenciesJetpack.androidxConstraintLayoutLib
-    implementation DependenciesGoogle.firebaseBoM
+    implementation platform(DependenciesGoogle.firebaseBoM)
     implementation DependenciesGoogle.firebaseAnalytics
     implementation DependenciesGoogle.firebaseMessaging
     implementation DependenciesGoogle.firebaseCrashlytics

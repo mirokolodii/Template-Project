@@ -4,8 +4,7 @@ object VersionsGoogle {
 }
 
 object DependenciesGoogle {
-    const val googleServicesGradlePlugin =
-        "com.google.gms:google-services:${VersionsGoogle.googleServices}"
+    const val googleServicesGradlePlugin = "com.google.gms:google-services:${VersionsGoogle.googleServices}"
     const val firebaseBoM = "com.google.firebase:firebase-bom:${VersionsGoogle.firebaseBoM}"
     const val firebaseAnalytics = "com.google.firebase:firebase-analytics-ktx"
     const val firebaseMessaging = "com.google.firebase:firebase-messaging-ktx"
