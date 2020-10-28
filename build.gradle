@@ -7,7 +7,10 @@ buildscript {
     dependencies {
         classpath DependenciesCore.gradlePlugin
         classpath DependenciesCore.kotlinGradlePlugin
+        classpath DependenciesCore.kotlinSerializationGradlePlugin
         classpath DependenciesGoogle.googleServicesGradlePlugin
+        classpath DependenciesGoogle.crashlyticsGradlePlugin
+        classpath DependenciesOther.realmGradlePlugin
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

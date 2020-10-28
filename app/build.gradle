@@ -2,32 +2,51 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlin.kapt'
 }
+
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion VersionsSdk.compileSdk
 
     defaultConfig {
+        project.ext.appName = 'Template'
         applicationId "com.unagit.templateproject"
         minSdkVersion VersionsSdk.minSdk
         targetSdkVersion VersionsSdk.targetSdk
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+        main.res.srcDirs = [
+                'src/main/res'
+        ]
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "app_name", "$project.ext.appName"
         }
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-dev"
+            resValue "string", "app_name", "$project.ext.appName-dev"
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -41,8 +60,51 @@ dependencies {
     implementation DependenciesJetpack.androidxAppcompatLib
     implementation DependenciesJetpack.androidxMaterialLib
     implementation DependenciesJetpack.androidxConstraintLayoutLib
+    implementation DependenciesJetpack.androidxFragment
+
+    implementation DependenciesCore.kotlinCoroutinesCore
+    implementation DependenciesCore.retrofitLib
+    implementation DependenciesCore.retrofitGsonConverter
+    implementation DependenciesCore.retrofitOkHttpLoggingInterceptor
+    implementation DependenciesCore.retrofitRxJava2Adapter
+    implementation DependenciesCore.retrofitOkHttp
+    implementation DependenciesCore.dagger
+    kapt DependenciesCore.daggerCompiler
+    implementation DependenciesCore.rxAndroid
+    implementation DependenciesCore.rxKotlin
+    implementation DependenciesCore.rxRelay
+
     implementation platform(DependenciesGoogle.firebaseBoM)
     implementation DependenciesGoogle.firebaseAnalytics
     implementation DependenciesGoogle.firebaseMessaging
     implementation DependenciesGoogle.firebaseCrashlytics
+
+    implementation DependenciesOther.timber
+    implementation DependenciesOther.butterKnife
+    kapt DependenciesOther.butterKnifeCompiler
+    implementation DependenciesOther.rxBluetooth
+
+
+    implementation (DependenciesOther.socketIO) {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+
+    coreLibraryDesugaring DependenciesOther.desugarJdkLibs
+}
+
+task addVersionNameAndCodeAndTimestampToApkFileName() {
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.name != "debug") {
+                def date = new Date().format("yyMMdd_HHmmss")
+                def fileName = "${project.ext.appName}_${variant.name}_${variant.versionName}(${variant.versionCode})_${date}.apk"
+                output.outputFileName = fileName
+            }
+        }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    addVersionNameAndCodeAndTimestampToApkFileName
 }
