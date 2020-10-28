@@ -9,7 +9,7 @@ object VersionsCore {
     const val dagger = "2.29.1"
     const val rxAndroid = "2.1.1"
     const val rxKotlin = "2.4.0"
-    const val rxBinding = "3.0.0"
+    const val rxBinding = "4.0.0"
     const val rxRelay = "2.1.1"
 }
 
@@ -30,6 +30,6 @@ object DependenciesCore {
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${VersionsCore.dagger}"
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${VersionsCore.rxAndroid}"
     const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${VersionsCore.rxKotlin}"
-    const val rxBinding = "com.jakewharton.rxbinding3:rxbinding:${VersionsCore.rxBinding}"
+    const val rxBinding = "com.jakewharton.rxbinding4:rxbinding:${VersionsCore.rxBinding}"
     const val rxRelay = "com.jakewharton.rxrelay2:rxrelay:${VersionsCore.rxRelay}"
 }
