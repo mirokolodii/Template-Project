@@ -1,0 +1,84 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+update_fastlane
+
+default_platform(:android)
+
+platform :android do
+
+  desc "Build"
+    lane :build do
+      gradle(task: "--no-daemon --max-workers=2 --stacktrace clean assembleQa")
+    end
+
+    desc "Slack success message"
+      lane :slack_success_message do
+        slack(
+          message: ":rocket: App build #{ENV["CIRCLE_BUILD_NUM"]} successfully uploaded to Firebase App Distribution :pushpin:",
+          success: true,
+          default_payloads: [:git_branch, :last_git_commit, :git_author],
+          slack_url: ENV["SLACK_WEBHOOK_URL"],
+          attachment_properties: {
+                       fields: [
+                           {
+                               title: "Build URL",
+                               value: ENV["CIRCLE_BUILD_URL"],
+                           }
+                       ]
+                   }
+        )
+    end
+
+    desc "Submit a new QA Build to Firebase App Distribution"
+      lane :beta do
+        begin
+            build
+            changelog = changelog_from_git_commits(
+                        commits_count: ENV["CHANGELOG_COMMITS_NUMBER"],
+                        date_format: "short",
+                        merge_commit_filtering: "exclude_merges"
+                    )
+            firebase_app_distribution(
+                        app: ENV["FIREBASE_APP_ID"],
+                        groups: "###",
+                        release_notes: changelog
+                    )
+            slack_success_message
+        end
+
+        # sh "your_script.sh"
+        # You can also use other beta testing services here
+      end
+
+      error do |lane, exception|
+         slack(
+             message: ":skull: Failed to build/upload app",
+             success: false,
+             slack_url: ENV["SLACK_WEBHOOK_URL"],
+             attachment_properties: {
+                 fields: [
+                     {
+                         title: "Build URL",
+                         value: ENV["CIRCLE_BUILD_URL"],
+                     },
+                     {
+                         title: "Error message",
+                         value: exception.to_s,
+                         short: false
+                     }
+                 ]
+             }
+         )
+      end
+end
