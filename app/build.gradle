@@ -33,16 +33,75 @@ android {
         ]
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue "string", "app_name", "$project.ext.appName"
+    signingConfigs {
+        def keystorePropertiesFile = rootProject.file("keystore.properties")
+        def properties = new Properties()
+        if (keystorePropertiesFile.exists()) {
+            properties.load(new FileInputStream(keystorePropertiesFile))
         }
         debug {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(properties["keystoreFile"])
+                storePassword = properties["keystorePassword"]
+                keyAlias = properties["debugAlias"]
+                keyPassword = properties["debugPassword"]
+            } else {
+                storeFile = file('keystore/app.keystore')
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEYSTORE_DEBUG_ALIAS")
+                keyPassword = System.getenv("KEYSTORE_DEBUG_PASSWORD")
+            }
+        }
+        qa {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(properties["keystoreFile"])
+                storePassword = properties["keystorePassword"]
+                keyAlias = properties["qaAlias"]
+                keyPassword = properties["qaPassword"]
+            } else {
+                storeFile = file('app.keystore')
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEYSTORE_QA_ALIAS")
+                keyPassword = System.getenv("KEYSTORE_QA_PASSWORD")
+            }
+        }
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(properties["keystoreFile"])
+                storePassword = properties["keystorePassword"]
+                keyAlias = properties["releaseAlias"]
+                keyPassword = properties["releasePassword"]
+            } else {
+                storeFile = file('app.keystore')
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEYSTORE_RELEASE_ALIAS")
+                keyPassword = System.getenv("KEYSTORE_RELEASE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
             applicationIdSuffix ".debug"
             versionNameSuffix "-dev"
             resValue "string", "app_name", "$project.ext.appName-dev"
+            signingConfig signingConfigs.debug
+        }
+        qa {
+            shrinkResources true
+            minifyEnabled true
+            applicationIdSuffix ".qa"
+            versionNameSuffix "-qa"
+            resValue "string", "app_name", "$project.ext.appName-qa"
+            signingConfig signingConfigs.qa
+        }
+        release {
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "app_name", "$project.ext.appName"
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
